@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>INDEX</title>
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="source.css">
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/maps/modules/map.js"></script>
+<script src="https://code.highcharts.com/mapdata/countries/us/us-all-all.js"></script>
+
+<script src="jquery.csv.min.js"></script>
+
+<div style="position: absolute; top: 40px; bottom: 20px; width: 100%;">
+    <div id="wrapper">
+        <div id="container"></div>
+        <div id="info">
+            <span class="f32"><span id="flag"></span></span>
+            <h2>Loading ...</h2>
+            <div class="subheader">Click countries to view history</div>
+            <div id="country-chart"></div>
+        </div>
+    </div>
+</div>
+
+
+<script src="source.js"></script>
+</body>
+</html>
