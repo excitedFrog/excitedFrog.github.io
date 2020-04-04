@@ -1,5 +1,5 @@
 $.ajax({
-    url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv',
+    url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv',
     success: function (csv) {
         csv = $.csv.toArrays(csv);
 
@@ -98,7 +98,7 @@ $.ajax({
                     $('#info h2').html('Comparing countries');
 
                 }
-                $('#info .subheader').html('<h4>Number of Death over time</h4><small><em>Shift + Click on map to compare countries</em></small>');
+                $('#info .subheader').html('<h4>Number of Confirmed Case over time</h4><small><em>Shift + Click on map to compare countries</em></small>');
 
                 if (!countyChart) {
                     countyChart = Highcharts.chart('country-chart', {
@@ -168,7 +168,7 @@ $.ajax({
         mapChart = Highcharts.mapChart('container', {
 
             title: {
-                text: 'U.S. COVID-19 Death Number Map'
+                text: 'U.S. COVID-19 Confirmed Case Number Map'
             },
 
             subtitle: {
@@ -213,7 +213,7 @@ $.ajax({
                 data: data,
                 mapData: mapData,
                 joinBy: ['fips', 'fips'],
-                name: 'Current Death Number',
+                name: 'Current Case Number',
                 allowPointSelect: true,
                 borderWidth: 0.5,
                 states: {
