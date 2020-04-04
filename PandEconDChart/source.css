@@ -10,7 +10,7 @@
 }
 #container {
     float: left;
-    height: 500px;
+    height: 800px;
     width: 700px;
     margin: 0;
 }
@@ -25,14 +25,24 @@
     display: inline;
     font-size: 13pt;
 }
-#info .f32 .flag {
-    vertical-align: bottom !important;
-}
-
 #info h4 {
     margin: 1em 0 0 0;
 }
+#info2 {
+    float: left;
+    width: 270px;
+    padding-left: 20px;
+    margin: 100px 0 0 0;
+    border-left: 1px solid silver;
+}
+#info2 h2 {
+    display: inline;
+    font-size: 13pt;
+}
 
+#info2 h4 {
+    margin: 1em 0 0 0;
+}
 @media screen and (max-width: 920px) {
     #wrapper, #container,  #info {
         float: none;

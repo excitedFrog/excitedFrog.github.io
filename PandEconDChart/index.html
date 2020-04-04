@@ -13,14 +13,32 @@
 
 <script src="jquery.csv.min.js"></script>
 
+<div class="ld-row" id="checkbox1">
+    <label class="ld-label">
+        Enable Projection
+    </label>
+    <input type="checkbox" checked="checked" id="enableProjection"/>
+</div>
+
+<div class="ld-row" id="checkbox2">
+    <label class="ld-label">
+        &Delta; Lag Days
+    </label>
+    <input type="range" class="ld-lag"  min="-5" max="5" value="0" id="deltaLagDays"/>
+</div>
+
 <div style="position: absolute; top: 40px; bottom: 20px; width: 100%;">
     <div id="wrapper">
         <div id="container"></div>
         <div id="info">
-            <span class="f32"><span id="flag"></span></span>
             <h2>Loading ...</h2>
             <div class="subheader">Click on county to view details.</div>
-            <div id="country-chart"></div>
+            <div id="county-chart"></div>
+        </div>
+        <div id="info2">
+            <h2></h2>
+            <div class="subheader"></div>
+            <div id="state-chart"></div>
         </div>
     </div>
 </div>
