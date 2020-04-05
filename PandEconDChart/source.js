@@ -231,11 +231,11 @@ $.ajax({
 
         // Add lower case codes to the data set for inclusion in the tooltip.pointFormat
         var mapData = Highcharts.geojson(
-            Highcharts.maps['countries/us/us-all-all']
+            Highcharts.maps['countries/us/us-all-all-highres']
             ),
             // Extract the line paths from the GeoJSON
             lines = Highcharts.geojson(
-                Highcharts.maps['countries/us/us-all-all'], 'mapline'
+                Highcharts.maps['countries/us/us-all-all-highres'], 'mapline'
             ),
             // Filter out the state borders and separator lines, we want these
             // in separate series
@@ -362,6 +362,7 @@ $.ajax({
                 });
 
                 points.forEach(function (p) {
+                    console.log(p.fips)
                     countyChart.addSeries({
                         id: 'realized',
                         name: p.name,

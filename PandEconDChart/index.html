@@ -12,7 +12,7 @@
 <!--<script src="https://code.highcharts.com/highcharts.js"></script>-->
 <script src="https://github.highcharts.com/maps/highmaps.src.js"></script>
 <script src="https://code.highcharts.com/maps/modules/map.js"></script>
-<script src="https://code.highcharts.com/mapdata/countries/us/us-all-all.js"></script>
+<script src="https://code.highcharts.com/mapdata/countries/us/us-all-all-highres.js"></script>
 
 <script src="jquery.csv.min.js"></script>
 
@@ -22,11 +22,34 @@
 
     <div id="wrapper">
         <div id="container"></div>
-        <div class="ld-row" id="checkbox2">
+        <div class="ld-row" id="deltaLagDaysBox">
             <label class="ld-label">
                 &Delta; Lag Days
             </label>
-            <input type="number" class="ld-lag"  value="0" id="deltaLagDays"/>
+            <select id="deltaLagDays" value="0">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-3">-3</option>
+
+            </select>
+        </div>
+        <div class="ld-row" id="day0Box">
+            <label class="ld-label">
+                Day 0
+            </label>
+            <select id="day0">
+                <option value="4/3/20">4/3/20</option>
+                <option value="4/2/20">4/2/20</option>
+                <option value="4/1/20">4/1/20</option>
+                <option value="3/31/20">3/31/20</option>
+                <option value="3/30/20">3/30/20</option>
+                <option value="3/29/20">3/29/20</option>
+                <option value="3/28/20">3/28/20</option>
+            </select>
         </div>
         <div id="info">
             <h2>Loading ...</h2>
