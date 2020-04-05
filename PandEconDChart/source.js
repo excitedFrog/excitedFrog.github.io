@@ -73,34 +73,20 @@ function abbrState(input, to) {
     }
 }
 
-function calcProjection(arr, lag) {
-    var arr_ = [];
-    for (i = 0; i < arr.length; i++) {
-        arr_.push(arr[i] * lag)
-    }
-    return arr_
-}
-
-function calcProjection2(arr, lag) {
-    var arr_ = [];
-    for (i = 0; i < arr.length; i++) {
-        arr_.push([arr[i][0], arr[i][1] * lag])
-    }
-    return arr_
-}
-
 const start_id_base = 11;
+const start_id_base_pred = 1;
 const start_id_add = 39;
-const start_id = start_id_base + start_id_add;
 
-var enableProjection = document.getElementById('enableProjection');
+const start_id = start_id_base + start_id_add;
+const start_id_pred = start_id_base_pred + start_id_add;
+
 var deltaLag = document.getElementById('deltaLagDays');
 
 $.ajax({
     url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv',
     success: function (csv) {
         csv = $.csv.toArrays(csv);
-        console.log(csv)
+        console.log(csv);
 
         var states = {},
             counties = {},
@@ -112,41 +98,38 @@ $.ajax({
             quoteRegex = /\"/g,
             categories = csv[0];
 
-        function updateStates() {
-            for (var abbr in states) {
-                if (states.hasOwnProperty(abbr)) {
-                    states[abbr] = {
-                        name: states[abbr].name,
-                        abbr: abbr,
-                        data: states[abbr].data,
-                        data2: states[abbr].data2,
-                        dataP: calcProjection(states[abbr].data, deltaLag.value),
-                        dataP2: calcProjection2(states[abbr].data2, deltaLag.value)
-                    }
-                }
-            }
-        }
         function updateCounties() {
-            for (var fips in counties) {
-                if (counties.hasOwnProperty(fips)) {
-                    counties[fips] = {
-                        name: counties[fips].name,
-                        fips: fips,
-                        data: counties[fips].data,
-                        data2: counties[fips].data2,
-                        dataP: calcProjection(counties[fips].data, deltaLag.value),
-                        dataP2: calcProjection2(counties[fips].data2, deltaLag.value),
-                        abbr: counties[fips].abbr
-                    }
+            url = 'https://raw.githubusercontent.com/excitedFrog/excitedFrog.github.io/master/PandEconDChart/data/pred_case' + parseInt(deltaLag.value).toString() + '.csv';
+            $.ajax({
+                url: url,
+                success: function (csv_county) {
+                    csv_county = $.csv.toArrays(csv_county);
+                    var categories = csv_county[0];
+                    $.each(csv_county.slice(1), function (j, row) {
+                        var fips = ("00000" + parseInt(row[0])).substr(-5, 5),
+                            data = [],
+                            data2 = [];
+                        $.each(row.slice(1), function (i, value) {
+                            data.push(parseInt(value));
+                            data2.push([categories[start_id_pred + i], parseInt(value)]);
+                            });
+                        counties[fips] = {
+                            name: counties[fips].name,
+                            fips: counties[fips].fips,
+                            abbr: counties[fips].abbr,
+                            data: counties[fips].data,
+                            data2: counties[fips].data2,
+                            dataP: data,
+                            dataP2: data2,
+                        }
+                    });
                 }
-            }
+            })
         }
+
         function updateChart() {
             while (countyChart.get('projection')) {
                 countyChart.get('projection').remove();
-            }
-            while (stateChart.get('projection')) {
-                stateChart.get('projection').remove();
             }
             var points = mapChart.getSelectedPoints();
             points.forEach(function (p) {
@@ -154,13 +137,6 @@ $.ajax({
                     id: 'projection',
                     name: p.name + ' (Projected)',
                     data: counties[p.fips].dataP2,
-                    type: 'line',
-                    dashStyle: 'ShortDot'
-                }, false);
-                stateChart.addSeries({
-                    id: 'projection',
-                    name: p.state_name + ' (Projected)',
-                    data: states[p.abbr].dataP2,
                     type: 'line',
                     dashStyle: 'ShortDot'
                 }, false);
@@ -222,11 +198,8 @@ $.ajax({
                 }
             }
         });
-        updateCounties();
-        updateStates();
 
-        console.log(states);
-        console.log(counties);
+        updateCounties();
 
         // For each county, use the latest value for current population
         var data = [];
@@ -408,13 +381,6 @@ $.ajax({
                         data: states[p.abbr].data2,
                         type: points.length > 1 ? 'line' : 'area'
                     }, false);
-                    stateChart.addSeries({
-                        id: 'projection',
-                        name: p.state_name + ' (Projected)',
-                        data: states[p.abbr].dataP2,
-                        type: 'line',
-                        dashStyle: 'ShortDot'
-                    }, false);
                 });
                 countyChart.redraw();
                 stateChart.redraw();
@@ -520,7 +486,6 @@ $.ajax({
 
         // jQuery Listen to change of parameters
         $('#deltaLagDays').change(function () {
-            updateStates();
             updateCounties();
             updateChart();
         })
