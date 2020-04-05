@@ -73,14 +73,34 @@ function abbrState(input, to) {
     }
 }
 
+function calcProjection(arr, lag) {
+    var arr_ = [];
+    for (i = 0; i < arr.length; i++) {
+        arr_.push(arr[i] * lag)
+    }
+    return arr_
+}
+
+function calcProjection2(arr, lag) {
+    var arr_ = [];
+    for (i = 0; i < arr.length; i++) {
+        arr_.push([arr[i][0], arr[i][1] * lag])
+    }
+    return arr_
+}
+
 const start_id_base = 11;
 const start_id_add = 39;
 const start_id = start_id_base + start_id_add;
+
+var enableProjection = document.getElementById('enableProjection');
+var deltaLag = document.getElementById('deltaLagDays');
 
 $.ajax({
     url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv',
     success: function (csv) {
         csv = $.csv.toArrays(csv);
+        console.log(csv)
 
         var states = {},
             counties = {},
@@ -91,6 +111,63 @@ $.ajax({
             lastCommaRegex = /,\s$/,
             quoteRegex = /\"/g,
             categories = csv[0];
+
+        function updateStates() {
+            for (var abbr in states) {
+                if (states.hasOwnProperty(abbr)) {
+                    states[abbr] = {
+                        name: states[abbr].name,
+                        abbr: abbr,
+                        data: states[abbr].data,
+                        data2: states[abbr].data2,
+                        dataP: calcProjection(states[abbr].data, deltaLag.value),
+                        dataP2: calcProjection2(states[abbr].data2, deltaLag.value)
+                    }
+                }
+            }
+        }
+        function updateCounties() {
+            for (var fips in counties) {
+                if (counties.hasOwnProperty(fips)) {
+                    counties[fips] = {
+                        name: counties[fips].name,
+                        fips: fips,
+                        data: counties[fips].data,
+                        data2: counties[fips].data2,
+                        dataP: calcProjection(counties[fips].data, deltaLag.value),
+                        dataP2: calcProjection2(counties[fips].data2, deltaLag.value),
+                        abbr: counties[fips].abbr
+                    }
+                }
+            }
+        }
+        function updateChart() {
+            while (countyChart.get('projection')) {
+                countyChart.get('projection').remove();
+            }
+            while (stateChart.get('projection')) {
+                stateChart.get('projection').remove();
+            }
+            var points = mapChart.getSelectedPoints();
+            points.forEach(function (p) {
+                countyChart.addSeries({
+                    id: 'projection',
+                    name: p.name + ' (Projected)',
+                    data: counties[p.fips].dataP2,
+                    type: 'line',
+                    dashStyle: 'ShortDot'
+                }, false);
+                stateChart.addSeries({
+                    id: 'projection',
+                    name: p.state_name + ' (Projected)',
+                    data: states[p.abbr].dataP2,
+                    type: 'line',
+                    dashStyle: 'ShortDot'
+                }, false);
+            });
+            countyChart.redraw();
+            stateChart.redraw();
+        }
 
         // Parse the CSV into arrays, one array each County
         $.each(csv.slice(1), function (j, row) {
@@ -116,7 +193,7 @@ $.ajax({
                     c_data2.push([categories[start_id + i], val]);
                 });
 
-                counties[("00000" + row[4]).substr(-5, 5)] = {
+                counties[("00000" + parseInt(row[4])).substr(-5, 5)] = {
                     name: c_name,
                     fips: c_fips,
                     data: c_data,
@@ -141,12 +218,15 @@ $.ajax({
                     name: s_name,
                     abbr: s_abbr,
                     data: s_data,
-                    data2: s_data2
+                    data2: s_data2,
                 }
             }
-
-
         });
+        updateCounties();
+        updateStates();
+
+        console.log(states);
+        console.log(counties);
 
         // For each county, use the latest value for current population
         var data = [];
@@ -208,14 +288,14 @@ $.ajax({
             var points = mapChart.getSelectedPoints();
             if (points.length) {
                 if (points.length === 1) {
-                    $('#info h2').html(points[0].name);
-                    $('#info2 h2').html(points[0].state_name + ' (state-level)');
+                    $('#info h2').html(points[0].name.split(',')[0] + ' County,' + points[0].name.split(',')[1]);
+                    $('#info2 h2').html(points[0].state_name + ' State');
                 } else {
                     $('#info h2').html('Comparing counties');
                     $('#info2 h2').html('Comparing state-level');
                 }
-                $('#info .subheader').html('<h4>Number of Confirmed Cases over time</h4><small><em>Shift + Click on map to compare counties</em></small>');
-                $('#info2 .subheader').html('<h4>Number of Confirmed Cases over time</h4>');
+                $('#info .subheader').html('<h4>Number of Infected Number over time</h4><small><em>Shift + Click on map to compare counties</em></small>');
+                $('#info2 .subheader').html('<h4>Number of Infected Number over time</h4>');
 
                 if (!countyChart) {
                     countyChart = Highcharts.chart('county-chart', {
@@ -296,7 +376,7 @@ $.ajax({
                                 threshold: 0,
                                 pointStart: parseInt(categories[start_id], 10)
                             }
-                        }
+                        },
                     });
                 }
 
@@ -310,26 +390,42 @@ $.ajax({
 
                 points.forEach(function (p) {
                     countyChart.addSeries({
+                        id: 'realized',
                         name: p.name,
                         data: counties[p.fips].data2,
                         type: points.length > 1 ? 'line' : 'area'
                     }, false);
-                });
-                countyChart.redraw();
-
-                points.forEach(function (p) {
+                    countyChart.addSeries({
+                        id: 'projection',
+                        name: p.name,
+                        data: counties[p.fips].dataP2,
+                        type: 'line',
+                        dashStyle: 'ShortDot'
+                    }, false);
                     stateChart.addSeries({
+                        id: 'realized',
                         name: p.state_name,
                         data: states[p.abbr].data2,
                         type: points.length > 1 ? 'line' : 'area'
                     }, false);
+                    stateChart.addSeries({
+                        id: 'projection',
+                        name: p.state_name + ' (Projected)',
+                        data: states[p.abbr].dataP2,
+                        type: 'line',
+                        dashStyle: 'ShortDot'
+                    }, false);
                 });
+                countyChart.redraw();
                 stateChart.redraw();
 
             } else {
                 $('#info #flag').attr('class', '');
                 $('#info h2').html('');
                 $('#info .subheader').html('');
+                $('#info2 #flag').attr('class', '');
+                $('#info2 h2').html('');
+                $('#info2 .subheader').html('');
                 if (countyChart) {
                     countyChart = countyChart.destroy();
                 }
@@ -343,7 +439,7 @@ $.ajax({
         mapChart = Highcharts.mapChart('container', {
 
             title: {
-                text: 'U.S. COVID-19 Confirmed Case Number Map'
+                text: 'U.S. COVID-19 Infected Number Map'
             },
 
             subtitle: {
@@ -409,18 +505,24 @@ $.ajax({
                     color: 'black',
                     shadow: false
                 },
-                // {
-                //     type: 'mapline',
-                //     name: 'Separator',
-                //     data: separatorLines,
-                //     color: 'black',
-                //     shadow: false
-                // }
+                {
+                    type: 'mapline',
+                    name: 'Separator',
+                    data: separatorLines,
+                    color: 'black',
+                    shadow: false
+                }
             ]
         });
 
         // Pre-select NYC
         mapChart.get('36061').select();
-        console.log(categories)
+
+        // jQuery Listen to change of parameters
+        $('#deltaLagDays').change(function () {
+            updateStates();
+            updateCounties();
+            updateChart();
+        })
     }
 });

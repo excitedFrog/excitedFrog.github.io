@@ -5,7 +5,9 @@
     <title>INDEX</title>
 </head>
 <body>
+
 <link rel="stylesheet" type="text/css" href="source.css">
+
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/maps/modules/map.js"></script>
@@ -13,23 +15,18 @@
 
 <script src="jquery.csv.min.js"></script>
 
-<div class="ld-row" id="checkbox1">
-    <label class="ld-label">
-        Enable Projection
-    </label>
-    <input type="checkbox" checked="checked" id="enableProjection"/>
-</div>
 
-<div class="ld-row" id="checkbox2">
-    <label class="ld-label">
-        &Delta; Lag Days
-    </label>
-    <input type="range" class="ld-lag"  min="-5" max="5" value="0" id="deltaLagDays"/>
-</div>
 
 <div style="position: absolute; top: 40px; bottom: 20px; width: 100%;">
+
     <div id="wrapper">
         <div id="container"></div>
+        <div class="ld-row" id="checkbox2">
+            <label class="ld-label">
+                &Delta; Lag Days
+            </label>
+            <input type="number" class="ld-lag"  value="2" id="deltaLagDays"/>
+        </div>
         <div id="info">
             <h2>Loading ...</h2>
             <div class="subheader">Click on county to view details.</div>

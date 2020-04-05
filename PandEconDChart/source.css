@@ -3,7 +3,7 @@
 }
 #wrapper {
     height: 500px;
-    width: 1000px;
+    width: 1200px;
     margin: 0 auto;
     padding: 0;
     overflow:visible;
@@ -11,12 +11,12 @@
 #container {
     float: left;
     height: 800px;
-    width: 700px;
+    width: 600px;
     margin: 0;
 }
 #info {
     float: left;
-    width: 270px;
+    width: 400px;
     padding-left: 20px;
     margin: 100px 0 0 0;
     border-left: 1px solid silver;
@@ -30,7 +30,7 @@
 }
 #info2 {
     float: left;
-    width: 270px;
+    width: 400px;
     padding-left: 20px;
     margin: 100px 0 0 0;
     border-left: 1px solid silver;
